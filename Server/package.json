@@ -1,0 +1,24 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "This is the server of AMDT Web App",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "AMDT Unit 41",
+    "NodeJS",
+    "Mongo",
+    "Express"
+  ],
+  "author": "Vivekha Gautham",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.17.1",
+    "monk": "^7.1.2",
+    "node-time-ago": "^1.0.0",
+    "nodemailer": "^6.4.3"
+  }
+}
