@@ -1,50 +1,35 @@
-const express = require("express");
-const cors = require("cors");
-var timeAgo = require("node-time-ago");
-const monk = require("monk");
-const mailer = require("./utilities/mailer");
+const express = require('express');
+const sendMail = require('./utilities/mailer');
+const log = console.log;
 const app = express();
+const path = require('path');
 
-app.use(express.json()); // Needed when working with POST requests (body contains JSON data)
-app.use(cors()); // to prevent CORS related issues
+const PORT = 8080;
 
-const db = monk("localhost/humandb");
-const dbfeatures = db.get("features");
+app.use(express.urlencoded({
+        extended: false
+}));
+app.use(express.json());
 
-app.get("/", function(req, res) {
-  res.send("Hello World!");
+
+app.post('/email', (req, res) =>{
+    // TODO:
+    const {email, username, comment} = req.body;
+    console.log('Data: ', req.body);
+
+    sendMail(email, username, comment, function(err,data){
+        if (err) {
+            res.status(500).json({message: 'Internal Error'});
+        } else {
+            res.json({ message: 'Email sent!!!'});
+        }
+    });
+    
 });
 
-app.get("/api/features", async function(req, res) {
-  //features.every(feature => (feature.time = timeAgo(feature.time)));
-  let allFeaturesInDb = await dbfeatures.find();
-  allFeaturesInDb.every(f => (f.time = timeAgo(f.time)));
-  res.send(allFeaturesInDb);
+
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'Client', 'index.html'));
 });
 
-app.post("/api/features", async function(req, res) {
-  var newFeatureToBeAddedToDb = {
-    body: req.body.feature,
-    author: req.body.name,
-    time: Date.now()
-  };
-  /*features.push(newFeatureToBeAddedToArray);*/
-  await dbfeatures.insert(newFeatureToBeAddedToDb);
-
-  // EMAIL SENDING LOGIC
-
-  var mailOptions = {
-    from: "--",
-    to: "--",
-    subject: "Sending Email using Node.js (Human Project exercise)",
-    text: "Dear, " + req.body.name + "!"
-  };
-  let result = await mailer.sendMail(mailOptions);
-  console.log(result);
-
-  res.send("Success");
-});
-
-app.listen(3000, function() {
-  console.log("Server has started listening on Port 3000");
-});
+app.listen(PORT, () => log('Server is starting on PORT, ', 8080));
